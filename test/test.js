@@ -15,7 +15,7 @@ test("TinyColor initialization", function() {
   });
 
   // Testing for other format (HWB, NCol, CMYK)
-  var conversions = [
+  var conversions2 = [
     {"hex":"#FFFFFF","rgb":{"r":"100.0%","g":"100.0%","b":"100.0%"},"hwb":{"h":"0","w":"100.0%","b":"000.0%"},"ncol":{"n":"R0","w":"100.0%","b":"000.0%"},"cmyk":{"c":"000.0%","m":"000.0%","y":"000.0%","k":"000.0%"}},
     {"hex":"#808080","rgb":{"r":"050.0%","g":"050.0%","b":"050.0%"},"hwb":{"h":"0","w":"050.0%","b":"050.0%"},"ncol":{"n":"R0","w":"050.0%","b":"050.0%"},"cmyk":{"c":"000.0%","m":"000.0%","y":"000.0%","k":"050.0%"}},
     {"hex":"#000000","rgb":{"r":"000.0%","g":"000.0%","b":"000.0%"},"hwb":{"h":"0","w":"000.0%","b":"100.0%"},"ncol":{"n":"R0","w":"000.0%","b":"100.0%"},"cmyk":{"c":"000.0%","m":"000.0%","y":"000.0%","k":"100.0%"}},
@@ -37,8 +37,8 @@ test("TinyColor initialization", function() {
   module("Color translations");
   
   test("Color Equality", function() {
-    for (var i = 0; i < conversions.length; i++) {
-      var c =  conversions[i];
+    for (var i = 0; i < conversions2.length; i++) {
+      var c =  conversions2[i];
       var tiny =  tinycolor(c.hex);
       
       if ([].indexOf(c.hex)!=-1){
@@ -143,16 +143,16 @@ test("TinyColor initialization", function() {
   module("Initialization from tinycolor output");
   
   test("HWB Object", function() {
-    for (var i = 0; i < conversions.length; i++) {
-      var c =  conversions[i];
+    for (var i = 0; i < conversions2.length; i++) {
+      var c =  conversions2[i];
       var tiny =  tinycolor(c.hex);
       equal(tiny.toHexString(), tinycolor(tiny.toHwb()).toHexString(), "HWB Object");
     }
   });
   
   test("HWB String", function() {
-    for (var i = 0; i < conversions.length; i++) {
-      var c =  conversions[i];
+    for (var i = 0; i < conversions2.length; i++) {
+      var c =  conversions2[i];
       var tiny =  tinycolor(c.hex);
       var input = tiny.toRgb();
       var output = tinycolor(tiny.toHwbString()).toRgb();
@@ -165,8 +165,8 @@ test("TinyColor initialization", function() {
   });
   
   test("NCol Object", function() {
-    for (var i = 0; i < conversions.length; i++) {
-      var c =  conversions[i];
+    for (var i = 0; i < conversions2.length; i++) {
+      var c =  conversions2[i];
       var tiny =  tinycolor(c.hex);
       var input = tiny.toRgb();
       var output = tinycolor(tiny.toNcolString()).toRgb();
@@ -177,8 +177,8 @@ test("TinyColor initialization", function() {
   });
   
   test("NCol String", function() {
-    for (var i = 0; i < conversions.length; i++) {
-      var c =  conversions[i];
+    for (var i = 0; i < conversions2.length; i++) {
+      var c =  conversions2[i];
       var tiny =  tinycolor(c.hex);
       var input = tiny.toRgb();
       var output = tinycolor(tiny.toNcolString()).toRgb();

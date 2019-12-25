@@ -23,7 +23,7 @@ module.exports = function(grunt) {
     },
 
     qunit: {
-      all: ['test/_index.html', 'test/index.html']
+      all: ['test/index.html']
     },
 
 
