@@ -1,4 +1,8 @@
-// TinyColor v1.4.1
+// TinyColor v2.0.1
+// https://github.com/chingcm/TinyColor
+// Dem Ching, MIT License
+
+// Original from TinyColor v1.4.1
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
 
@@ -27,12 +31,12 @@ function tinycolor (color, opts) {
     }
 
     var rgb = inputToRGB(color);
-    this._originalInput = color,
-    this._r = rgb.r,
-    this._g = rgb.g,
-    this._b = rgb.b,
-    this._a = rgb.a,
-    this._roundA = mathRound(100*this._a) / 100,
+    this._originalInput = color;
+    this._r = rgb.r;
+    this._g = rgb.g;
+    this._b = rgb.b;
+    this._a = rgb.a;
+    this._roundA = mathRound(100*this._a) / 100;
     this._format = opts.format || rgb.format;
     this._gradientType = opts.gradientType;
 
@@ -140,6 +144,72 @@ tinycolor.prototype = {
           "rgb("  + mathRound(bound01(this._r, 255) * 100) + "%, " + mathRound(bound01(this._g, 255) * 100) + "%, " + mathRound(bound01(this._b, 255) * 100) + "%)" :
           "rgba(" + mathRound(bound01(this._r, 255) * 100) + "%, " + mathRound(bound01(this._g, 255) * 100) + "%, " + mathRound(bound01(this._b, 255) * 100) + "%, " + this._roundA + ")";
     },
+    toCmy: function() {
+        var cmy = rgbToCmy(this._r, this._g, this._b);
+        return { c: cmy.c * 100, m: cmy.m * 100, y: cmy.y * 100 };
+    },
+    toCmyString: function() {
+        var cmy = rgbToCmy(this._r, this._g, this._b),
+            c = mathRound(cmy.c * 100), m = mathRound(cmy.m * 100), y = mathRound(cmy.y * 100);
+        return "cmy("  + c + "%, " + m + "%, " + y + "%)";
+    },
+    toCmyk: function() {
+        var cmyk = rgbToCmyk(this._r, this._g, this._b);
+        return { c: cmyk.c * 100, m: cmyk.m * 100, y: cmyk.y * 100, k: cmyk.k * 100 };
+    },
+    toCmykString: function() {
+        var cmyk = rgbToCmyk(this._r, this._g, this._b),
+            c = mathRound(cmyk.c * 100), m = mathRound(cmyk.m * 100), y = mathRound(cmyk.y * 100), k = mathRound(cmyk.k * 100);
+        return "cmyk("  + c + "%, " + m + "%, " + y + "%, " + k + "%)";
+    },
+    toHwb: function() {
+        var hwb = rgbToHwb(this._r, this._g, this._b);
+        return { h: hwb.h * 360, w: hwb.w, b: hwb.b, a: this._a };
+    },
+    toHwbString: function() {
+        var hwb = rgbToHwb(this._r, this._g, this._b);
+        var h = mathRound(hwb.h * 360), w = mathRound(hwb.w * 100), b = mathRound(hwb.b * 100);
+        return (this._a == 1) ?
+            "hwb("  + h + ", " + w + "%, " + b + "%)" :
+            "hwba(" + h + ", " + w + "%, " + b + "%, "+ this._roundA + ")";
+    },
+    toNcol: function() {
+        var ncol = rgbToNcol(this._r, this._g, this._b);
+        return { n: ncol.n, w: ncol.w, b: ncol.b, a: this._a };
+    },
+    toNcolString: function() {
+        var ncol = rgbToNcol(this._r, this._g, this._b);
+        var n = ncol.n, w = mathRound(ncol.w * 100), b = mathRound(ncol.b * 100);
+        return (this._a == 1) ?
+            n + ", " + w + "%, " + b + "%" :
+            n + ", " + w + "%, " + b + "%, "+ this._roundA;
+    },
+    toNcs: function() {
+        var ncs = rgbToNcs(this._r, this._g, this._b);
+        return { s: ncs.s, c: ncs.c, n: ncs.n.toUpperCase() };
+    },
+    toNcsString: function() {
+        var ncs = rgbToNcs(this._r, this._g, this._b);
+        return ncsToString(ncs.s, ncs.c, ncs.n);
+    },
+    toXyz: function() {
+        var xyz = rgbToXyz(this._r, this._g, this._b);
+        return { x: xyz.x * 100, y: xyz.y * 100, z: xyz.z * 100 };
+    },
+    toXyzString: function() {
+        var xyz = rgbToXyz(this._r, this._g, this._b),
+            x = (xyz.x * 100).toFixed(2), y = (xyz.y * 100).toFixed(2), z = (xyz.z * 100).toFixed(2);
+        return "xyz(" + x + ", " + y + ", " + z + ")";
+    },
+    toLab: function() {
+        var lab = rgbToLab(this._r, this._g, this._b);
+        return { l: lab.l, a: lab.a, b: lab.b };
+    },
+    toLabString: function() {
+        var lab = rgbToLab(this._r, this._g, this._b),
+            l = lab.l.toFixed(2), a = lab.a.toFixed(2), b = lab.b.toFixed(2);
+        return "lab(" + l + ", " + a + ", " + b + ")";
+    },
     toName: function() {
         if (this._a === 0) {
             return "transparent";
@@ -206,6 +276,27 @@ tinycolor.prototype = {
         if (format === "hsv") {
             formattedString = this.toHsvString();
         }
+        if (format === "hwb") {
+            formattedString = this.toHwbString();
+        }
+        if (format === "ncol") {
+            formattedString = this.toNcolString();
+        }
+        if (format === "ncs") {
+            formattedString = this.toNcsString();
+        }
+        if (format === "cmyk") {
+            formattedString = this.toCmykString();
+        }
+        if (format === "cmy") {
+            formattedString = this.toCmyString();
+        }
+        if (format === "xyz") {
+            formattedString = this.toXyzString();
+        }
+        if (format === "lab") {
+            formattedString = this.toLabString();
+        }
 
         return formattedString || this.toHexString();
     },
@@ -263,6 +354,37 @@ tinycolor.prototype = {
     },
     tetrad: function() {
         return this._applyCombination(tetrad, arguments);
+    },
+    tetradRect: function() {
+        return this._applyCombination(tetradRect, arguments);
+    },
+    pentad: function() {
+        return this._applyCombination(pentad, arguments);
+    },
+    hexad: function() {
+        return this._applyCombination(hexad, arguments);
+    },
+    distance: function(color, relative) {
+        var rgb;
+        if (typeof color === "object" && color.hasOwnProperty("_r") && color.hasOwnProperty("_g") && color.hasOwnProperty("_b")) {
+            rgb = color.toRgb();
+        } else if (typeof color === "object" && color.hasOwnProperty("r") && color.hasOwnProperty("g") && color.hasOwnProperty("b")) {
+            rgb = color;
+        } else {
+            rgb = tinycolor(color).toRgb();
+        }
+        return colorDistance(this.toRgb(), rgb, relative);
+    },
+    isCloseTo: function (color) {
+        var rgb;
+        if (typeof color === "object" && color.hasOwnProperty("_r") && color.hasOwnProperty("_g") && color.hasOwnProperty("_b")) {
+            rgb = color.toRgb();
+        } else if (typeof color === "object" && color.hasOwnProperty("r") && color.hasOwnProperty("g") && color.hasOwnProperty("b")) {
+            rgb = color;
+        } else {
+            rgb = tinycolor(color).toRgb();
+        }
+        return colorSimilarity(this.toRgb(), rgb);
     }
 };
 
@@ -336,7 +458,56 @@ function inputToRGB(color) {
             ok = true;
             format = "hsl";
         }
-
+        else if (isValidCSSUnit(color.c) && isValidCSSUnit(color.m) && isValidCSSUnit(color.y) && isValidCSSUnit(color.k)) {
+            c = convertToPercentage(color.c);
+            m = convertToPercentage(color.m);
+            y = convertToPercentage(color.y);
+            k = convertToPercentage(color.k);
+            rgb = cmykToRgb(c, m, y, k);
+            ok = true;
+            format = "cmyk";
+        }
+        else if (isValidCSSUnit(color.c) && isValidCSSUnit(color.m) && isValidCSSUnit(color.y)) {
+            c = convertToPercentage(color.c);
+            m = convertToPercentage(color.m);
+            y = convertToPercentage(color.y);
+            rgb = cmyToRgb(c, m, y);
+            ok = true;
+            format = "cmy";
+        }
+        else if (isValidCSSUnit(color.h) && isValidCSSUnit(color.w) && isValidCSSUnit(color.b))
+        {
+            w = convertToPercentage(color.w);
+            b = convertToPercentage(color.b);
+            rgb = hwbToRgb(color.h, w, b);
+            ok = true;
+            format = "hwb";
+        }
+        else if (isValidNcolHue(color.n) && isValidCSSUnit(color.w) && isValidCSSUnit(color.b)) {
+            w = convertToPercentage(color.w);
+            b = convertToPercentage(color.b);
+            rgb = ncolToRgb(color.n, w, b);
+            ok = true;
+            format = "ncol";
+        }
+        else if (isValidNcsHue(color.n) && isValidCSSUnit(color.s) && isValidCSSUnit(color.c)) {
+            rgb = ncsToRgb(color.s, color.c, color.n);
+            ok = true;
+            format = "ncs";
+        }
+        else if (isValidCSSUnit(color.x) && isValidCSSUnit(color.y) && isValidCSSUnit(color.z)) {
+            x = convertToPercentage(color.x);
+            y = convertToPercentage(color.y);
+            z = convertToPercentage(color.z);
+            rgb = xyzToRgb(x, y, z);
+            ok = true;
+            format = "xyz";
+        }
+        else if (isValidCSSUnit(color.l) && isValidCSSUnit(color.A) && isValidCSSUnit(color.b)) {
+            rgb = labToRgb(color.l, color.A, color.b);
+            ok = true;
+            format = "lab";
+        }
         if (color.hasOwnProperty("a")) {
             a = color.a;
         }
@@ -548,10 +719,501 @@ function rgbaToArgbHex(r, g, b, a) {
     return hex.join("");
 }
 
+// `rgbToCmy`
+// Convert an RGB color to CMY
+// *Assumes* r, g, and b are contained in the set [0, 255]
+// *Returns:* { c, m, y, k } in [0, 1]
+function rgbToCmy(r, g, b) {
+
+    r = bound01(r, 255);
+    g = bound01(g, 255);
+    b = bound01(b, 255);
+
+    return { c: 1 - r, m: 1 - g, y: 1 - b };
+}
+
+// `cmyToRgb`
+// Convert an CMY color to RGB
+// *Assumes:* c, m, y are contained in the set [0, 1] or [0, 100]
+// *Returns:* { r, g, b } in the set [0, 255]
+function cmyToRgb(c, m, y) {
+
+    c = bound01(c, 100);
+    m = bound01(m, 100);
+    y = bound01(y, 100);
+
+    return { r: (1 - c) * 255, g: (1 - m) * 255, b: (1 - y) * 255 };
+}
+
+// `rgbToCmyk`
+// Convert an RGB color to CMYK
+// *Assumes* r, g, and b are contained in the set [0, 255]
+// *Returns:* { c, m, y, k } in [0, 1]
+function rgbToCmyk(r, g, b) {
+
+    r = bound01(r, 255);
+    g = bound01(g, 255);
+    b = bound01(b, 255);
+
+    var max = mathMax(r, g, b);
+    var c, m, y, k = 1 - max;
+
+    if(k == 1) {
+        c = 0;
+        m = 0;
+        y = 0;
+    }
+    else {
+        c = (1 - r - k) / (1 - k);
+        m = (1 - g - k) / (1 - k);
+        y = (1 - b - k) / (1 - k);
+    }
+    return { c: c, m: m, y: y, k: k };
+}
+
+// `cmykToRgb`
+// Convert an CMYK color to RGB
+// *Assumes:* c, m, y, k are contained in the set [0, 1] or [0, 100]
+// *Returns:* { r, g, b } in the set [0, 255]
+function cmykToRgb(c, m, y, k) {
+
+    c = bound01(c, 100);
+    m = bound01(m, 100);
+    y = bound01(y, 100);
+    k = bound01(k, 100);
+
+    return { r: (1 - c) * (1 - k) * 255, g: (1 - m) * (1 - k) * 255, b: (1 - y) * (1 - k) * 255 };
+}
+
+// `rgbToHwb`
+// Convert an RGB color to HWB
+// *Assumes* r, g, and b are contained in the set [0, 255]
+// *Returns:* { h, w, b } in [0, 1]
+function rgbToHwb(r, g, b) {
+
+    r = bound01(r, 255);
+    g = bound01(g, 255);
+    b = bound01(b, 255);
+
+    var max = mathMax(r, g, b), min = mathMin(r, g, b);
+    var h, w = min, B = 1 - max;
+
+    if(max == min) {
+        h = 0; // achromatic
+    }
+    else {
+        var d = max - min;
+        switch(max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+    }
+    return { h: h, w: w, b: B };
+}
+
+// `hwbToRgb`
+// Converts an HWB color value to RGB.
+// *Assumes:* h is contained in [0, 1] or [0, 360] and w and b are contained in [0, 1] or [0, 100]
+// *Returns:* { r, g, b } in the set [0, 255]
+function hwbToRgb(h, w, B) {
+
+    w = bound01(w, 100);
+    B = bound01(B, 100);
+
+    var v = 1 - B,
+        s = v === 0 ? 0 : (1 - w / v);
+
+    return hsvToRgb(h, convertToPercentage(s), convertToPercentage(v));
+}
+
+// `rgbToXyz`
+// Convert an RGB color to XYZ
+// *Assumes* r, g, and b are contained in the set [0, 255]
+// *Returns:* { x, y, z } in [0, 1]
+function rgbToXyz(r, g, b) {
+
+    var x, y, z,
+        M = matrix.rgbxyz,
+        handleRgb = function (v) {
+            v = bound01(v, 255);
+            return (v > 0.04045) ? Math.pow((v + 0.055) / 1.055, 2.4) : v / 12.92;
+        };
+
+    r = handleRgb(r);
+    g = handleRgb(g);
+    b = handleRgb(b);
+
+    x = (r * M.x[0] + g * M.x[1] + b * M.x[2]);
+    y = (r * M.y[0] + g * M.y[1] + b * M.y[2]);
+    z = (r * M.z[0] + g * M.z[1] + b * M.z[2]);
+
+    return { x: x, y: y, z: z };
+}
+
+// `xyzToRgb`
+// Converts an XYZ color value to RGB.
+// *Assumes:* x, y and z are contained in [0, 1] or [0, 100]
+// *Returns:* { r, g, b } in the set [0, 255]
+function xyzToRgb(x, y, z) {
+
+    x = bound01(x, 100);
+    y = bound01(y, 100);
+    z = bound01(z, 100);
+
+    var M = matrix.rgbxyz,
+        r = x * M.r[0] + y * M.r[1] + z * M.r[2],
+        g = x * M.g[0] + y * M.g[1] + z * M.g[2],
+        b = x * M.b[0] + y * M.b[1] + z * M.b[2],
+        handleRgb = function (v) {
+            v = v > 0.0031308 ? 1.055 * Math.pow(v, 1 / 2.4) - 0.055 : 12.92 * v;
+            return v > 1 ? 1 : v < 0 ? 0 : v;
+        };
+
+    return {
+        r: handleRgb(r) * 255,
+        g: handleRgb(g) * 255,
+        b: handleRgb(b) * 255
+    };
+}
+
+// `rgbToLab`
+// Convert an RGB color to LAB
+// *Assumes* r, g, and b are contained in the set [0, 255]
+// *Returns:* { l } in [0, 100] and { a, b } in [-110, 110]
+function rgbToLab(r, g, b) {
+
+    var M = matrix.rgbxyz,
+        handleXyz = function (v, arr) {
+            v = v / arr.reduce(function (p, c) { return p + c; }, 0);
+            return (v > 0.008856) ? Math.pow(v, 1 / 3) : v * 7.787037 + 16 / 116;
+        },
+        xyz = rgbToXyz(r, g, b),
+        x = handleXyz(xyz.x, M.x),
+        y = handleXyz(xyz.y, M.y),
+        z = handleXyz(xyz.z, M.z);
+
+    return { l: y * 116 - 16, a: 500 * (x - y), b: 200 * (y - z) };
+}
+
+// `labToRgb`
+// Converts an LAB color value to RGB.
+// *Assumes:* l is contained in [0, 100], a and b are contained in [-110, 110]
+// *Returns:* { r, g, b } in the set [0, 255]
+function labToRgb(l, a, b) {
+
+    l = parseFloat(l);
+    a = parseFloat(a);
+    b = parseFloat(b);
+
+    var M = matrix.rgbxyz,
+        y = (l + 16) / 116,
+        x = a / 500 + y,
+        z = y - b / 200,
+        handleXyz = function (v, arr) {
+            return (Math.pow(v, 3) > 0.008856 ? Math.pow(v, 3) : (v - 16 / 116) / 7.787037) * arr.reduce(function (p, c) { return p + c; }, 0);
+        };
+
+    return xyzToRgb(handleXyz(x, M.x) * 100, handleXyz(y, M.y) * 100, handleXyz(z, M.z) * 100);
+}
+
+// `rgbToNcol`
+// Convert an RGB color to NCol (initiative from W3Schools)
+// *Assumes* r, g, and b are contained in the set [0, 255]
+// *Returns:* { n } in [RYGCBM][0, 99] { w, b } in [0, 1]
+function rgbToNcol(r, g, b) {
+
+    var hwb = rgbToHwb(r, g, b),
+        ncol = ["r", "y", "g", "c", "b", "m"];
+    var h = mathRound(hwb.h * 600),
+        w = hwb.w,
+        B = hwb.b,
+        R = h % 100,
+        n = ncol[(h - R) / 100] + R;
+
+    return { n: n.toUpperCase(), w: w, b: B };
+}
+
+// `ncolToRgb`
+// Converts an NCol color value to RGB.
+// *Assumes:* n is contained in [RYGCBM][0, 99] and w and b are contained in [0, 1] or [0, 100]
+// *Returns:* { r, g, b } in the set [0, 255]
+function ncolToRgb(n, w, B) {
+
+    n = n.toLowerCase();
+
+    var h = ((["r", "y", "g", "c", "b", "m"].indexOf(n[0]) * 100 + parseFloat(n.slice(1))) * 0.6) % 360;
+
+    return hwbToRgb(h, w, B);
+}
+
+// Natural Color System.
+
+// Thanks to w3color.js for some of the basics here.
+// <https://www.w3schools.com/lib/w3color.js>
+
+// *CAUTION:*       NCS has no offical conversion formula at this moment.
+//                  Values returned are NOT accurate and may not even exist in the system.
+//                  Functions below only try to find the nearest and possible value.
+//                  Check the official website to learn more about NCS.
+//                  <https://ncscolour.com/>
+
+// `ncsToString`
+// Format NCS string.
+// *Assumes:* s and c are contained in [0, 100] and n is contained in [RYGBN]([0, 99][RYGB])
+// *Returns:* NCS standard value
+function ncsToString(s, c, n) {
+
+    s = bound01(convertToPercentage(s), 100);
+    c = bound01(convertToPercentage(c), 100);
+
+    return "S " + ("00" + mathRound(s * 100)).slice(-2) + ("00" + mathRound(c * 100)).slice(-2) + "-" + n.toUpperCase();
+}
+
+// `ncsToRgb`
+// *CAUTION:* The function below might not return expected value. For detail, please check [here](#section-36).
+// Converts an NCS color value to RGB.
+// *Assumes:* s and c are contained in [0, 1] or [0, 100] and n is contained in [RYGBN]([0, 99][RYGB])
+// *Returns:* { r, g, b } in the set [0, 255]
+function ncsToRgb(s, c, n) {
+
+    if (tinycolor.hasOwnProperty("library")) {
+        var code = ncsToString(s, c, n);
+        if (code in tinycolor.library.ncs) {
+            return tinycolor(tinycolor.library.ncs[code]).toRgb();
+        }
+    }
+
+    n = n.toLowerCase();
+    s = bound01(s, 100);
+    c = bound01(c, 100);
+
+    function processValue(value, factor, black) {
+        var final = value * factor * (1 - black);
+        return final > 1 ? 1 : final < 0 ? 0 : final;
+    }
+    var match = matchers.NCS_HUE_MATCH.exec(n).filter(function (v) { return typeof v !== "undefined"; }),
+        n1 = match[1], p = 0,
+        r = 0,
+        g = 0,
+        b = 0,
+        s1, c1 = c,
+        r1, g1, b1, r2, g2, b2, f1, f2;
+
+    if (match.length >= 4) {
+        p = bound01(match[2], 100);
+    }
+
+    if (n1 == "n") {
+        r = g = b = 1 - s;
+    } else {
+        s1 = 1.05 * (s - 0.05);
+        if (n1 == "y") {
+            r1 = p <= 0.6 ? 1 : (Math.sqrt((1.82 - p) * (0.62 + p)) - 0.22);
+            g1 = 0.85 * (1 - p);
+            b1 = p <= 0.8 ? 0 : (1.04 - Math.sqrt((1.655 - p) * (0.465 + p)));
+        } else if (n1 == "r") {
+            r1 = p > 0.8 ? 0 : (Math.sqrt((0.82 - p) * (1.62 + p)) - 0.22);
+            g1 = p <= 0.6 ? 0 : (0.675 - Math.sqrt((1.01 - p) * (0.51 + p)));
+            b1 = p > 0.6 ? (Math.sqrt((2.2 - p) * (-0.2 + p)) - 0.1) : (1.04 - Math.sqrt((0.655 - p) * (1.465 + p)));
+        } else if (n1 == "b") {
+            r1 = 0;
+            g1 = p > 0.6 ? 0.9 : (0.065 + Math.sqrt((1.524 - p) * (0.151 + p)));
+            b1 = p <= 0.8 ? (Math.sqrt((1.2 - p) * (0.8 + p)) - 0.1) : (1.22 - Math.sqrt((3.52 - p) * (-0.7 + p)));
+        } else if (n1 == "g") {
+            r1 = Math.sqrt((3.5384 - p) * (0.1384 + p)) - 0.7;
+            g1 = p <= 0.6 ? 0.9 : (0.975 - 0.125 * p);
+            b1 = p > 0.4 ? 0 : (1.22 - Math.sqrt((2.52 - p) * (0.3 + p)));
+        }
+        f1 = (r1 + g1 + b1) / 3;
+        r2 = (f1 - r1) * (1 - c1) + r1;
+        g2 = (f1 - g1) * (1 - c1) + g1;
+        b2 = (f1 - b1) * (1 - c1) + b1;
+        f2 = 1 / ((r2 == g2 || g2 == b2 || r2 == b2) ? (r2 + g2 + b2) / 3 : mathMax(r2, g2, b2));
+        r = processValue(r2, f2, s1);
+        g = processValue(g2, f2, s1);
+        b = processValue(b2, f2, s1);
+    }
+
+    return { r: r * 255, g: g * 255, b: b * 255 };
+}
+
+// `rgbToNcs`
+// *CAUTION:* The function below might not return expected value. For detail, please check [here](#section-36).
+// *Assumes* r, g, and b are contained in the set [0, 255]
+// *Returns:* { s, c } in the set of [0, 100] and n in [RYGBN]([0, 99][RYGB]) or false if cannot found a valid color\
+function rgbToNcs(r, g, b) {
+    var hwb, B = 0,
+        sum = r + g + b,
+        avg = sum / 3,
+        max = mathMax(r, g, b),
+        isMax = [],
+        data = {}, result = false;
+    if (r / sum > 0.5 || g / sum > 0.5 || b / sum > 0.5) {
+        // Modify color
+        r += (avg - r) / 3 / (r == 128 ? 1.5 : Math.abs(r - 128) / Math.abs(r - avg)); 
+        g += (avg - g) / 3 / (g == 128 ? 1.5 : Math.abs(g - 128) / Math.abs(g - avg)); 
+        b += (avg - b) / 3 / (b == 128 ? 1.5 : Math.abs(b - 128) / Math.abs(b - avg));
+        sum = r + g + b;
+        avg = sum / 3;
+        max = mathMax(r, g, b);
+        B = -5;
+    }
+    hwb = rgbToHwb(r, g, b);
+    B += mathRound(hwb.b * 100);
+    data = {
+        blackness: mathMin(40, B),
+        original: { r: r, g: g, b: b},
+        diff: sum,
+        avg: avg
+    };
+    if (Math.abs(r - max) < 6 || r / avg > 1) isMax.push("r");
+    if (Math.abs(g - max) < 6 || g / avg > 1) isMax.push("g");
+    if (Math.abs(b - max) < 6 || b / avg > 1) isMax.push("b");
+
+    if (isMax.length == 3) {
+        data.start = "n";
+    } else if (isMax.indexOf("b") != -1 && isMax.indexOf("g") != -1) {
+        data.start = "b";
+        data.end = "g";
+    } else if (isMax.indexOf("r") != -1 && isMax.indexOf("g") != -1) {
+        data.start = "g";
+        data.end = "y";
+    } else if (isMax.indexOf("r") != -1 && isMax.indexOf("b") != -1) {
+        data.start = "r";
+        data.end = "b";
+    } else if (isMax.indexOf("b") != -1) {
+        data.start = "r60b";
+        data.end = "b40g";
+    } else if (isMax.indexOf("g") != -1) {
+        data.start = "b50g";
+        data.end = "g70y";
+    } else if (isMax.indexOf("r") != -1) {
+        data.start = "g80y";
+        data.end = "r50b";
+    }
+
+    if (tinycolor.hasOwnProperty("plugins")) {
+        result = tinycolor.plugins.toClosestNcs(data);
+    }
+    if (!result) {
+        result = toClosestNcs(data);
+    }
+
+    if (!(result.hasOwnProperty("best"))) return { s: 90, c: 0, n: "n"};
+
+    return result.best;
+}
+
+// `toClosestNcs`
+// *CAUTION:* The function below might not return expected value. For detail, please check [here](#section-36).
+
+// Find the closest NCS value from given data.
+// *Returns:* data contains possible NCS value
+function toClosestNcs(DATA) {
+    var data = JSON.parse(JSON.stringify(DATA)),
+        n1 = data.start, n2,
+        s = data.blackness - data.blackness % 5,
+        maxS = s + 10, c = 0, p = 0,
+        maxP = 90, maxC = 85, distance;
+    if (n1[0] == "n") {
+        maxP = 0;
+        data.end = "n";
+    } else if (n1[0] == "y") {
+        n2 = "r";
+    } else if (n1[0] == "r") {
+        n2 = "b";
+        maxC = 70;
+    } else if (n1[0] == "b") {
+        n2 = "g";
+        maxC = 65;
+    } else if (n1[0] == "g") {
+        n2 = "y";
+        maxC = 75;
+    }
+
+    if (data.hasOwnProperty("end") && data.end.length > 1 && n1[0] == data.end[0]) {
+        maxP = parseInt(data.end.slice(1, 3), 10);
+    }
+
+    if (maxS > 85 && n1[0] != "n") maxS = 85;
+    else if (maxS > 90 && n1[0] == "n") maxS = 90;
+    if (maxP > 90) maxP = 90;
+
+    while (s <= maxS) {
+        c = 0;
+        while (c <= maxC) {
+            p = n1.length > 1 ? parseInt(n1.slice(1, 3), 10) : 0;
+            while (p <= maxP) {
+                tempN = n1[0];
+                if (tempN != "n") tempN += ("00" + p).slice(-2) + n2;
+                var color = ncsToRgb(s, c, tempN);
+                distance = colorDistance(data.original, color);
+                if (distance < data.diff && colorSimilarity(data.original, color)) {
+                    data.best = {
+                        s: s,
+                        c: c,
+                        n: tempN
+                    };
+                    data.diff = distance;
+                }
+                p += 10;
+            }
+            c += 5;
+        }
+        s += 5;
+    }
+    if (data.start[0] != "n" && data.hasOwnProperty("end") && data.start[0] != data.end[0]) {
+        data.start = n2;
+        return toClosestNcs(data);
+    }
+    return data;
+}
+
+// `colorDistance`
+// Calculate the distance between two colors
+// *Assumes:* color1 and color2 contain a RGB object { r: r, g: g, b: b }
+// *Returns:* distance
+function colorDistance(color1, color2, relative) {
+    var ratioR = 1, ratioG = 1, ratioB = 1, meanR;
+    if (typeof color2 === "undefined") {
+        color2 = { r: 0, g: 0, b: 0 };
+    }
+    if (typeof relative !== "undefined" && relative) {
+        meanR = (color1.r + color2.r) / 2;
+        ratioR = 2 + meanR / 256;
+        ratioB = 2 + (255 - meanR) / 256;
+        ratioG = 4;
+    }
+    return Math.sqrt(ratioR * Math.pow(color1.r - color2.r, 2) + ratioG * Math.pow(color1.g - color2.g, 2) + ratioB * Math.pow(color1.b - color2.b, 2));
+}
+
+// `colorSimilarity`
+// Evaluate the simialarity between two colors.
+// *Assumes:* color1 and color2 contain a RGB object { r: r, g: g, b: b }
+// *Returns:* true / false
+function colorSimilarity(color1, color2) {
+    var distance = colorDistance(color1, color2),
+        diffR = Math.abs(color1.r - color2.r),
+        diffG = Math.abs(color1.g - color2.g),
+        diffB = Math.abs(color1.b - color2.b),
+        smallAngle = function (x1, x2, y1, y2) {
+            return (Math.atan(x1 / y1) - Math.atan(x2 / y2)) * 180 / Math.PI < 15;
+        },
+        isSmallAngle = smallAngle(color1.r, color2.r, color1.g, color2.g) &&
+                       smallAngle(color1.g, color2.g, color1.b, color2.b) &&
+                       smallAngle(color1.b, color2.b, color1.r, color2.r);
+    return diffR / distance < 0.666 && diffG / distance < 0.666 && diffB / distance < 0.666 && isSmallAngle;
+}
+
 // `equals`
 // Can be called with any tinycolor input
-tinycolor.equals = function (color1, color2) {
+tinycolor.equals = function (color1, color2, format) {
     if (!color1 || !color2) { return false; }
+    if (format) {
+        return tinycolor(color1).toString(format) == tinycolor(color2).toString(format);
+    }
     return tinycolor(color1).toRgbString() == tinycolor(color2).toRgbString();
 };
 
@@ -652,6 +1314,42 @@ function tetrad(color) {
         tinycolor({ h: (h + 90) % 360, s: hsl.s, l: hsl.l }),
         tinycolor({ h: (h + 180) % 360, s: hsl.s, l: hsl.l }),
         tinycolor({ h: (h + 270) % 360, s: hsl.s, l: hsl.l })
+    ];
+}
+
+function tetradRect(color) {
+    var hsl = tinycolor(color).toHsl();
+    var h = hsl.h;
+    return [
+        tinycolor(color),
+        tinycolor({ h: (h + 60) % 360, s: hsl.s, l: hsl.l }),
+        tinycolor({ h: (h + 180) % 360, s: hsl.s, l: hsl.l }),
+        tinycolor({ h: (h + 240) % 360, s: hsl.s, l: hsl.l })
+    ];
+}
+
+function pentad(color) {
+    var hsl = tinycolor(color).toHsl();
+    var h = hsl.h;
+    return [
+        tinycolor(color),
+        tinycolor({ h: (h + 72) % 360, s: hsl.s, l: hsl.l }),
+        tinycolor({ h: (h + 144) % 360, s: hsl.s, l: hsl.l }),
+        tinycolor({ h: (h + 216) % 360, s: hsl.s, l: hsl.l }),
+        tinycolor({ h: (h + 288) % 360, s: hsl.s, l: hsl.l })
+    ];
+}
+
+function hexad(color) {
+    var hsl = tinycolor(color).toHsl();
+    var h = hsl.h;
+    return [
+        tinycolor(color),
+        tinycolor({ h: (h + 60) % 360, s: hsl.s, l: hsl.l }),
+        tinycolor({ h: (h + 120) % 360, s: hsl.s, l: hsl.l }),
+        tinycolor({ h: (h + 180) % 360, s: hsl.s, l: hsl.l }),
+        tinycolor({ h: (h + 240) % 360, s: hsl.s, l: hsl.l }),
+        tinycolor({ h: (h + 300) % 360, s: hsl.s, l: hsl.l })
     ];
 }
 
@@ -957,6 +1655,16 @@ var names = tinycolor.names = {
 // Make it easy to access colors via `hexNames[hex]`
 var hexNames = tinycolor.hexNames = flip(names);
 
+var matrix = tinycolor.matrix = {
+    rgbxyz: {
+        x: [ 0.4124564,  0.3575761,  0.1804375],
+        y: [ 0.2126729,  0.7151522,  0.0721750],
+        z: [ 0.0193339,  0.1191920,  0.9503041],
+        r: [ 3.2404542, -1.5371385, -0.4985314],
+        g: [-0.9692660,  1.8760108,  0.0415560],
+        b: [ 0.0556434, -0.2040259,  1.0572252]
+    }
+};
 
 // Utilities
 // ---------
@@ -1059,20 +1767,39 @@ var matchers = (function() {
     // Allow positive/negative integer/number.  Don't capture the either/or, just the entire outcome.
     var CSS_UNIT = "(?:" + CSS_NUMBER + ")|(?:" + CSS_INTEGER + ")";
 
+    // Repeat this value for CSS value with more than 2 parameters.
+    var CSS_UNIT_REPEATING = "[,|\\s]+(" + CSS_UNIT + ")";
+
     // Actual matching.
     // Parentheses and commas are optional, but not required.
     // Whitespace can take the place of commas or opening paren
-    var PERMISSIVE_MATCH3 = "[\\s|\\(]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")\\s*\\)?";
-    var PERMISSIVE_MATCH4 = "[\\s|\\(]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")\\s*\\)?";
+    var PERMISSIVE_MATCH3 = "[\\s|\\(]+(" + CSS_UNIT + ")" + CSS_UNIT_REPEATING.repeat(2) + "\\s*\\)?";
+    var PERMISSIVE_MATCH4 = "[\\s|\\(]+(" + CSS_UNIT + ")" + CSS_UNIT_REPEATING.repeat(3) + "\\s*\\)?";
+    var NCOL_HUE_MATCH = "\\s*[rygcbm](" + CSS_UNIT + ")?";
+    var NCOL_MATCH3 = "\\s*(" + NCOL_HUE_MATCH + ")" + CSS_UNIT_REPEATING.repeat(2) + "\\s*";
+    var NCOL_MATCH4 = "\\s*(" + NCOL_HUE_MATCH + ")" + CSS_UNIT_REPEATING.repeat(3) + "\\s*";
+    var NCS_HUE_MATCH = "(?:([rygb])(\\d{2})([rygb]))|(?:([rygbn]))";
+    var NCS_MATCH = "(\\d{2})(\\d{2})-(" + NCS_HUE_MATCH + ")";
 
     return {
         CSS_UNIT: new RegExp(CSS_UNIT),
+        NCOL_HUE_MATCH: new RegExp(NCOL_HUE_MATCH, "i"),
+        NCS_HUE_MATCH: new RegExp(NCS_HUE_MATCH, "i"),
         rgb: new RegExp("rgb" + PERMISSIVE_MATCH3),
         rgba: new RegExp("rgba" + PERMISSIVE_MATCH4),
         hsl: new RegExp("hsl" + PERMISSIVE_MATCH3),
         hsla: new RegExp("hsla" + PERMISSIVE_MATCH4),
         hsv: new RegExp("hsv" + PERMISSIVE_MATCH3),
         hsva: new RegExp("hsva" + PERMISSIVE_MATCH4),
+        cmyk: new RegExp("cmyk" + PERMISSIVE_MATCH4),
+        cmy: new RegExp("cmy" + PERMISSIVE_MATCH3),
+        hwb: new RegExp("hwb" + PERMISSIVE_MATCH3),
+        hwba: new RegExp("hwba" + PERMISSIVE_MATCH4),
+        ncol: new RegExp(NCOL_MATCH3, "i"),
+        ncola: new RegExp(NCOL_MATCH4, "i"),
+        ncs: new RegExp(NCS_MATCH, "i"),
+        xyz: new RegExp("xyz" + PERMISSIVE_MATCH3),
+        lab: new RegExp("lab" + PERMISSIVE_MATCH3),
         hex3: /^#?([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
         hex6: /^#?([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/,
         hex4: /^#?([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
@@ -1085,6 +1812,20 @@ var matchers = (function() {
 // (see `matchers` above for definition).
 function isValidCSSUnit(color) {
     return !!matchers.CSS_UNIT.exec(color);
+}
+
+// `isValidNcolHue`
+// Take in a single string / number and check to see if it looks like a NCol hue
+// (see `matchers` above for definition).
+function isValidNcolHue(color) {
+    return !!matchers.NCOL_HUE_MATCH.exec(color);
+}
+
+// `isValidNcsHue`
+// Take in a single string / number and check to see if it looks like a NCS hue
+// (see `matchers` above for definition).
+function isValidNcsHue(color) {
+    return !!matchers.NCS_HUE_MATCH.exec(color);
 }
 
 // `stringInputToObject`
@@ -1125,6 +1866,18 @@ function stringInputToObject(color) {
     if ((match = matchers.hsva.exec(color))) {
         return { h: match[1], s: match[2], v: match[3], a: match[4] };
     }
+    if ((match = matchers.cmyk.exec(color))) {
+        return { c: match[1], m: match[2], y: match[3], k: match[4] };
+    }
+    if ((match = matchers.cmy.exec(color))) {
+        return { c: match[1], m: match[2], y: match[3] };
+    }
+    if ((match = matchers.hwb.exec(color))) {
+        return { h: match[1], w: match[2], b: match[3] };
+    }
+    if ((match = matchers.hwba.exec(color))) {
+        return { h: match[1], w: match[2], b: match[3], a: match[4] };
+    }
     if ((match = matchers.hex8.exec(color))) {
         return {
             r: parseIntFromHex(match[1]),
@@ -1158,6 +1911,21 @@ function stringInputToObject(color) {
             b: parseIntFromHex(match[3] + '' + match[3]),
             format: named ? "name" : "hex"
         };
+    }
+    if ((match = matchers.xyz.exec(color))) {
+        return { x: match[1], y: match[2], z: match[3] };
+    }
+    if ((match = matchers.lab.exec(color))) {
+        return { l: match[1], A: match[2], b: match[3] };
+    }
+    if ((match = matchers.ncola.exec(color))) {
+        return { n: match[1] + (typeof match[2] === "undefined" ? 0 : ""), w: match[3], b: match[4], a: match[5] };
+    }
+    if ((match = matchers.ncol.exec(color))) {
+        return { n: match[1] + (typeof match[2] === "undefined" ? 0 : ""), w: match[3], b: match[4] };
+    }
+    if ((match = matchers.ncs.exec(color))) {
+        return { s: match[1], c: match[2], n: match[3] };
     }
 
     return false;

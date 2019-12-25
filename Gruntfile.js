@@ -5,8 +5,8 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     meta: {
       banner: '// TinyColor v<%= pkg.version %>\n' +
-        '// https://github.com/bgrins/TinyColor\n' +
-        '// <%= grunt.template.today("yyyy-mm-dd") %>, Brian Grinstead, MIT License\n'
+        '// https://github.com/chingcm/TinyColor\n' +
+        '// <%= grunt.template.today("yyyy-mm-dd") %>, Dem Ching, MIT License\n'
     },
 
     uglify: {
@@ -16,13 +16,14 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'dist/tinycolor-min.js': ['tinycolor.js']
+          'dist/tinycolor-min.js': ['tinycolor.js'],
+          'dist/tinycolor-plugin-min.js': ['tinycolor.plugin.js']
         }
       }
     },
 
     qunit: {
-      all: ['test/index.html']
+      all: ['test/_index.html', 'test/index.html']
     },
 
 
@@ -34,12 +35,12 @@ module.exports = function(grunt) {
           jQuery: true
         }
       },
-      all: ['tinycolor.js']
+      all: ['tinycolor.js', 'tinycolor.plugin.js']
     },
 
     docco: {
       debug: {
-        src: ['tinycolor.js'],
+        src: ['tinycolor.js', 'tinycolor.plugin.js'],
         options: {
           output: 'docs/'
         }

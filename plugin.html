@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+
+  <title>TinyColor - Fast, small color manipulation in JavaScript</title>
+
+	<link rel="stylesheet" href="demo/demo.css" type="text/css" media="screen" />
+	<script type='text/javascript' src='demo/jquery-1.9.1.js'></script>
+	<script type='text/javascript' src='tinycolor.js'></script>
+	<script type='text/javascript' src='tinycolor.plugin.js'></script>
+	<script type='text/javascript'>
+
+		function colorChange(color) {
+			var tiny = tinycolor.plugins.getLibraryColor(color);
+			if (!tiny.isValid()) return false;
+			var theme = color.match(/([a-z0-9]+)[- .\s]/i)[1];
+			if (theme == "bootstrap") theme += 4;
+
+			var output = [
+				"hex:\t" + tiny.toHexString(),
+				"hex8:\t" + tiny.toHex8String(),
+				"rgb:\t" + tiny.toRgbString(),
+				"hsl:\t" + tiny.toHslString(),
+				"hsv:\t" + tiny.toHsvString(),
+				"hwb:\t" + tiny.toHwbString(),
+				"cmyk:\t" + tiny.toCmykString(),
+				"lab:\t" + tiny.toLabString(),
+				"name:\t" + (tiny.toName() || "none"),
+				"format:\t" + (tiny.getFormat()),
+				"format string:\t" + tiny.toString(),
+			].join("\n");
+
+			$("#code-output").text(output).css("border-color", tiny.toHexString());
+		}
+
+		function colorListToHTML(list) {
+			var html = '<table>', name;
+			for (var theme in list) {
+				html += '<tr><th>'+theme+'</th><td>';
+				$.map(list[theme], function(i,e) {
+					name = theme.toLowerCase().replace(/ /g, "") + " " + i;
+					html += '<span data-name="'+name+'" title="'+i+'" style="background:'+tinycolor.plugins.getLibraryColor(name).toHexString()+'"></span>';
+				});
+				html += '</td>';
+			}
+			html += "</table>";
+			$("#list-output").append(html);
+		}
+
+		$(function() {
+			$("#color").bind("keyup change", function() {
+				colorChange($(this).val());
+			});
+			colorChange("bootstrap4-danger");
+
+			$("#inputter a").click(function() {
+				var text = $(this).text();
+			     $("#color").val(text).trigger("change");
+                return false;
+			});
+			$(document).on("click", "#list-output span", function(e) {
+				var text = $(e.target).data("name")
+			     $("#color").val(text).trigger("change");
+                return false;
+			})
+			
+			var allColors = {
+				"Bootstrap 4": ["primary", "success", "info", "warning", "danger"],
+				"Flat UI": ["sunflower", "amethyst", "nephritis", "alizarin", "peterriver"],
+				"Material": ["red", "blue", "yellow", "green", "lime"],
+				"Metro UI": ["green", "lightpurple", "darkpurple", "blue", "red"],
+			}
+			colorListToHTML(allColors);
+		});
+
+	</script>
+</head>
+
+<body>
+    <div id="container">
+		<h1>TinyColor - Plugin</h1>
+		<h2>Fast, small color manipulation and conversion for JavaScript</h2>
+
+		<p>
+			<a href="https://github.com/chingcm/TinyColor">TinyColor</a> is a micro framework for inputting colors and outputting colors as different formats.
+			Input is meant to be as permissive as possible.
+		</p>
+		<p>This plugin contains lists of colors, including colors used in Flat UI, Material, Metro UI.</p>
+
+		<h3>Usage Documentation</h3>
+		<p>Read the documentation on the <a href='https://github.com/chingcm/TinyColor#plugin'>TinyColor project page</a> on github.</p>
+
+		<h3>Code</h3>
+		<p><a href='docs/tinycolor.plugin.html'>View the annotated source code</a> or <a href='https://github.com/chingcm/TinyColor/blob/master/tinycolor.plugin.js'>see the full source on github</a>.</p>
+
+		<h3>Demo</h3>
+		<div id='demo'>
+			<div id='inputter'>
+				<p>
+					Enter a color: <input type="text" placeholder="any color." id='color' />
+				</p>
+				<p>
+					Or try these:
+					<a href="#">material blue</a>
+					<a href="#">flatui emerald</a>
+					<a href="#">bootstrap4 danger</a>
+					<a href="#">metroui purple</a>
+					<a href="#">flatui greensea 200</a>
+				</p>
+				<p>And I'll tell you what I know about it:</p>
+			</div>
+
+			<pre id='code-output'></pre>
+
+			<h3>Sample of Colors</h3>
+			<div id='list-output'></div>
+		</div>
+
+		<h3>Credit</h3>
+		<p>Developed by Dem Ching.</p>
+  	</div>
+</body>
+</html>

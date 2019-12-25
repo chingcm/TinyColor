@@ -18,7 +18,9 @@
 				"hex8:\t" + tiny.toHex8String(),
 				"rgb:\t" + tiny.toRgbString(),
 				"hsl:\t" + tiny.toHslString(),
-				"hsv:\t" + tiny.toHsvString(),
+				"hwb:\t" + tiny.toHwbString(),
+				"cmyk:\t" + tiny.toCmykString(),
+				"lab:\t" + tiny.toLabString(),
 				"name:\t" + (tiny.toName() || "none"),
 				"format:\t" + (tiny.getFormat()),
 				"format string:\t" + tiny.toString(),
@@ -67,7 +69,6 @@
 
 			 var triad = tiny.triad();
 			 combines.find(".triad").html(colorArrayToHTML(triad));
-			 console.log(triad.map(function(f) {return f.toHexString();}));
 
 			 var tetrad = tiny.tetrad();
 			 combines.find(".tetrad").html(colorArrayToHTML(tetrad));
@@ -89,9 +90,18 @@
 			colorChange({r: 150, g: 0, b: 100});
 
 			$("#inputter a").click(function() {
-			     $("#color").val($(this).text()).trigger("change");
+				var text = $(this).text();
+				if ($(this).hasClass("random")) {
+					text = tinycolor.random().toHex()
+				}
+			     $("#color").val(text).trigger("change");
                 return false;
 			});
+			$(document).on("click", "#filter-output div, #combine-output span", function(e) {
+				var text = $(e.target).css("background-color")
+			     $("#color").val(text).trigger("change");
+                return false;
+			})
 		});
 
 	</script>
@@ -103,18 +113,20 @@
 	<h2>Fast, small color manipulation and conversion for JavaScript</h2>
 
 	<p>
-	   <a href="https://github.com/bgrins/TinyColor">TinyColor</a> is a micro framework for inputting colors and outputting colors as different formats.
+	   <a href="https://github.com/chingcm/TinyColor">TinyColor</a> is a micro framework for inputting colors and outputting colors as different formats.
 	   Input is meant to be as permissive as possible.
   </p>
+  	<p>This version is modified from <a href="https://github.com/bgrins/TinyColor">TinyColor</a> by Brian Grinstead.</p>
 
 	<h3>Usage Documentation</h3>
-	<p>Read all the documentation on the <a href='https://github.com/bgrins/TinyColor'>TinyColor project page</a> on github.</p>
+	<p>Read all the documentation on the <a href='https://github.com/chingcm/TinyColor'>TinyColor project page</a> on github.</p>
 
 	<h3>Code</h3>
-	<p><a href='docs/tinycolor.html'>View the annotated source code</a> or <a href='https://github.com/bgrins/TinyColor/blob/master/tinycolor.js'>see the full source on github</a>.</p>
+	<p><a href='docs/tinycolor.html'>View the annotated source code</a> or <a href='https://github.com/chingcm/TinyColor/blob/master/tinycolor.js'>see the full source on github</a>.</p>
 
 	<h3>Tests</h3>
-	<p><a href='test/'>View the QUnit Tests</a>.</p>
+	<p>View the QUnit <a href='test/'>Tests</a> in this version.</p>
+	<p>View the QUnit <a href='test/_index.html'>Tests</a> in the original repository.</p>
 
 	<h3>Demo</h3>
 	<div id='demo'>
@@ -129,6 +141,9 @@
 	           <a href="#">rgb 255 128 128</a>
 	           <a href='#'>hsl(0, 100%, 50%)</a>
 	           <a href='#'>hsv 0, 100%, 50%</a>
+	           <a href='#'>hwb 0 100% 50%</a>
+	           <a href='#'>NCS 0510-B70G</a>
+	           <a class="random" href='#'>Random</a>
 	   </p>
 	   <p>And I'll tell you what I know about it:</p>
 	</div>
@@ -190,9 +205,12 @@
 	</div>
 
 
+	<h3>Plugin</h3>
+	<p>There is a plugin contains different color lists, eg. Flat UI, Material and Metro UI. Check the <a href="plugin.html">Demo</a> page for more detail.</p>
 	<h3>Credit</h3>
+	<p>Developed by Dem Ching.</p>
 	<p>
-	   Developed by <a href='http://briangrinstead.com'>Brian Grinstead</a>.  Big thanks to the following places:
+	   Orginal code from <a href='http://briangrinstead.com'>Brian Grinstead</a>.  Big thanks to the following places:
 	</p>
 	<ul>
 	   <li><a href='https://github.com/cloudhead/less.js/blob/master/lib/less/functions.js'>less.js</a> for some of the modification functions</li>

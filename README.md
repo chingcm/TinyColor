@@ -1,469 +1,261 @@
-# TinyColor
+# TinyColor 2.0
 
 ## JavaScript color tooling
 
 TinyColor is a small, fast library for color manipulation and conversion in JavaScript.  It allows many forms of input, while providing color conversions and other color utility functions.  It has no dependencies.
 
-[![Build Status](https://travis-ci.org/bgrins/TinyColor.png?branch=master)](https://travis-ci.org/bgrins/TinyColor)
+TinyColor 2.0 is able to convert more types of color models such as HWB, CMYK and LAB. Some feature is added like calculate the distance between two colors.
 
 ## Including in a browser
 
-Download [tinycolor.js](https://raw.githubusercontent.com/bgrins/TinyColor/master/tinycolor.js) or install it with bower:
-
-    bower install tinycolor
-
-Then just include it in the page in a `script` tag:
+Download [tinycolor.js](https://raw.githubusercontent.com/chingcm/TinyColor/master/tinycolor.js).
 ```html
 <script type='text/javascript' src='tinycolor.js'></script>
-<script type='text/javascript'>
-var color = tinycolor("red");
-</script>
 ```
-## Including in node
 
-`tinycolor` may also be included as a [node](http://nodejs.org/) module like so:
-
-    npm install tinycolor2
-
-Then it can be used in your script like so:
-```js
-var tinycolor = require("tinycolor2");
-var color = tinycolor("red");
-```
 ## Usage
 
 Call `tinycolor(input)` or `new tinycolor(input)`, and you will have an object with the following properties.  See Accepted String Input and Accepted Object Input below for more information about what is accepted.
 
+For detailed usage, please check the original [repository](https://github.com/bgrins/TinyColor#usage)
+
 ## Accepted String Input
 
-The string parsing is very permissive.  It is meant to make typing a color as input as easy as possible.  All commas, percentages, parenthesis are optional, and most input allow either 0-1, 0%-100%, or 0-n (where n is either 100, 255, or 360 depending on the value).
+TinyColor accepts the following input: Hex, RGB, HSL, HSV and named color.
+For detailed, please check the original [repository](https://github.com/bgrins/TinyColor#accepted-string-input)
 
-HSL and HSV both require either 0%-100% or 0-1 for the `S`/`L`/`V` properties.  The `H` (hue) can have values between 0%-100% or 0-360.
+This edited repository accepts extra color models to make it more powerful.
+Here are some examples:
 
-RGB input requires either 0-255 or 0%-100%.
-
-If you call `tinycolor.fromRatio`, RGB and Hue input can also accept 0-1.
-
-Here are some examples of string input:
-
-### Hex, 8-digit (RGBA) Hex
+### HWB, HWBA
+HWB (Hue, Whiteness, Blackness) is a suggested standard for CSS4.
+HWB accepts `0% - 100%` or `0 - 1` for property `W` and `B`, accepts `0% - 100%` or `0 - 360` for property `H`.
 ```js
-tinycolor("#000");
-tinycolor("000");
-tinycolor("#369C");
-tinycolor("369C");
-tinycolor("#f0f0f6");
-tinycolor("f0f0f6");
-tinycolor("#f0f0f688");
-tinycolor("f0f0f688");
+tinycolor("hwb (90, 35%, 9%)");
+tinycolor("hwb (90, 0.35, 0.09)");
+tinycolor("hwba (90, 35%, 9%, .5)");
+tinycolor("hwb 90 0.35 0.09");
+tinycolor({ h: 90, w: 0.35, b: 0.09 });
+tinycolor.fromRatio({ h: 0.25, w: 0.35, b: 0.09, a: 0.5 });
 ```
-### RGB, RGBA
-```js
-tinycolor("rgb (255, 0, 0)");
-tinycolor("rgb 255 0 0");
-tinycolor("rgba (255, 0, 0, .5)");
-tinycolor({ r: 255, g: 0, b: 0 });
-tinycolor.fromRatio({ r: 1, g: 0, b: 0 });
-tinycolor.fromRatio({ r: .5, g: .5, b: .5 });
-```
-### HSL, HSLA
-```js
-tinycolor("hsl(0, 100%, 50%)");
-tinycolor("hsla(0, 100%, 50%, .5)");
-tinycolor("hsl(0, 100%, 50%)");
-tinycolor("hsl 0 1.0 0.5");
-tinycolor({ h: 0, s: 1, l: .5 });
-tinycolor.fromRatio({ h: 1, s: 0, l: 0 });
-tinycolor.fromRatio({ h: .5, s: .5, l: .5 });
-```
-### HSV, HSVA
-```js
-tinycolor("hsv(0, 100%, 100%)");
-tinycolor("hsva(0, 100%, 100%, .5)");
-tinycolor("hsv (0 100% 100%)");
-tinycolor("hsv 0 1 1");
-tinycolor({ h: 0, s: 100, v: 100 });
-tinycolor.fromRatio({ h: 1, s: 0, v: 0 });
-tinycolor.fromRatio({ h: .5, s: .5, v: .5 });
-```
-### Named
-```js
-tinycolor("RED");
-tinycolor("blanchedalmond");
-tinycolor("darkblue");
-```
-### Accepted Object Input
 
-If you are calling this from code, you may want to use object input.  Here are some examples of the different types of accepted object inputs:
+### CMYK
+CMYK (Cyan, Magenta, Yellow, Black) is a suggested standard for CSS4. Mostly used in printing.
+CMYK accepts `0% - 100%` or `0 - 1` for all properties (`C`, `M`, `Y`, `K`).
+```js
+tinycolor("cmyk (29%, 24%, 0%, 19%)");
+tinycolor("cmyk 0.29 0.24 0 0.19");
+tinycolor({ c: 0.29, m: 0.24, y: 0, k: 0.19 });
+```
 
-    { r: 255, g: 0, b: 0 }
-    { r: 255, g: 0, b: 0, a: .5 }
-    { h: 0, s: 100, l: 50 }
-    { h: 0, s: 100, v: 100 }
+### CMY
+CMY (Cyan, Magenta, Yellow) accepts `0% - 100%` or `0 - 1` for all properties (`C`, `M`, `Y`).
+```js
+tinycolor("cmy (40%, 35%, 15%)");
+tinycolor("cmy 0.4 0.35 .15");
+```
+
+### XYZ
+XYZ accepts `0 - 1`00 or `0 - 1` for all properties (`X`, `Y`, `Z`).
+```js
+tinycolor("xyz (39.22, 38.95, 70.91)");
+tinycolor("xyz 0.3922 0.3895 0.7091");
+```
+
+### CIELAB
+CIELAB accepts `0 - 100` or `0 - 1` for property `L`, accepts `-110 - 110` for property `A` and `B`.
+```js
+tinycolor("lab (68.72, 7.09, -27.30)");
+tinycolor("lab 68.72 7.09 -27.30");
+tinycolor({ l: 68.72, A: 7.09, b: -27.30 });  // In CIELAB, use "A" instead of "a" to distinguish with Opacity "a" in other models
+```
+
+### NCol
+NCol (Natural Color) is an initiative from W3Schools. Check [here](https://www.w3schools.com/colors/colors_ncol.asp) for more detail.
+NCol accepts `0% - 100%` or `0 - 1` for property `W` and `B`, accepts string `R/Y/G/C/B/M` follow by number `0-99` for property `N`.
+```js
+tinycolor("C80, 60%, 15%");
+tinycolor({ n: "C80", w: 0.6, b: 0.15 });
+```
+
+### NCS
+NCS (Natural Color System)  is the color standard in Sweden, Spain, Norway and South Africa. 1950 colors contained in this standard.
+**Warning**
+*Since there is no conversion formula, it is not possible to return the exact and valid color code. The function is programmed based on w3color.js which try to return a similar color.*
+NCS accepts `0 - 100` or `0 - 1` for property `S` and `C`, accepts single character `R/Y/G/B/N` or character `R/Y/G/B` follow by number `0-99` then by character `R/Y/G/B`.
+```js
+tinycolor("S 2050-R60B");
+tinycolor("2050-r60b");
+tinycolor({ s: 0.2, c: 0.5, n: "r60b" });
+tinycolor("S 5000-n");
+tinycolor({ s: 0.5, c: 0, n: "N" });
+```
 
 ## Methods
+Supported methods:
+`getFormat` - get the input format of the TinyColor instance
+`isValid` - validate the input
+`getBrightness` - get brightness of a color
+`isLight` or `isDark` - check if the color is perceived as bright
+`getLuminance` - get perceived luminance of a color
+More methods and usage can be found [here](https://github.com/bgrins/TinyColor#methods)
 
-### getFormat
+## String Representations
+For conversion between `HSL`, `HSV`, `HEX` and `RGB`, details can be found [here](https://github.com/bgrins/TinyColor#string-representations)
 
-Returns the format used to create the tinycolor instance
+### toHwb
 ```js
 var color = tinycolor("red");
-color.getFormat(); // "name"
-color = tinycolor({r:255, g:255, b:255});
-color.getFormat(); // "rgb"
+color.toHwb(); // { h: 0, w: 0, b: 0, a: 1 }
 ```
 
-### getOriginalInput
-
-Returns the input passed into the constructer used to create the tinycolor instance
+### toHwbString
 ```js
 var color = tinycolor("red");
-color.getOriginalInput(); // "red"
-color = tinycolor({r:255, g:255, b:255});
-color.getOriginalInput(); // "{r: 255, g: 255, b: 255}"
-```
-
-### isValid
-
-Return a boolean indicating whether the color was successfully parsed.  Note: if the color is not valid then it will act like `black` when being used with other methods.
-```js
-var color1 = tinycolor("red");
-color1.isValid(); // true
-color1.toHexString(); // "#ff0000"
-
-var color2 = tinycolor("not a color");
-color2.isValid(); // false
-color2.toString(); // "#000000"
-```
-### getBrightness
-
-Returns the perceived brightness of a color, from `0-255`, as defined by [Web Content Accessibility Guidelines (Version 1.0)](http://www.w3.org/TR/AERT#color-contrast).
-```js
-var color1 = tinycolor("#fff");
-color1.getBrightness(); // 255
-
-var color2 = tinycolor("#000");
-color2.getBrightness(); // 0
-```
-### isLight
-
-Return a boolean indicating whether the color's perceived brightness is light.
-```js
-var color1 = tinycolor("#fff");
-color1.isLight(); // true
-
-var color2 = tinycolor("#000");
-color2.isLight(); // false
-```
-### isDark
-
-Return a boolean indicating whether the color's perceived brightness is dark.
-```js
-var color1 = tinycolor("#fff");
-color1.isDark(); // false
-
-var color2 = tinycolor("#000");
-color2.isDark(); // true
-```
-### getLuminance
-
-Returns the perceived luminance of a color, from `0-1` as defined by [Web Content Accessibility Guidelines (Version 2.0).](http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef)
-```js
-var color1 = tinycolor("#fff");
-color1.getLuminance(); // 1
-
-var color2 = tinycolor("#000");
-color2.getLuminance(); // 0
-```
-### getAlpha
-
-Returns the alpha value of a color, from `0-1`.
-```js
-var color1 = tinycolor("rgba(255, 0, 0, .5)");
-color1.getAlpha(); // 0.5
-
-var color2 = tinycolor("rgb(255, 0, 0)");
-color2.getAlpha(); // 1
-
-var color3 = tinycolor("transparent");
-color3.getAlpha(); // 0
-```
-### setAlpha
-
-Sets the alpha value on a current color.  Accepted range is in between `0-1`.
-```js
-var color = tinycolor("red");
-color.getAlpha(); // 1
-color.setAlpha(.5);
-color.getAlpha(); // .5
-color.toRgbString(); // "rgba(255, 0, 0, .5)"
-```
-### String Representations
-
-The following methods will return a property for the `alpha` value, which can be ignored: `toHsv`, `toHsl`, `toRgb`
-
-### toHsv
-```js
-var color = tinycolor("red");
-color.toHsv(); // { h: 0, s: 1, v: 1, a: 1 }
-```
-### toHsvString
-```js
-var color = tinycolor("red");
-color.toHsvString(); // "hsv(0, 100%, 100%)"
+color.toHwbString(); // hwb(0, 0%, 0%)
 color.setAlpha(0.5);
-color.toHsvString(); // "hsva(0, 100%, 100%, 0.5)"
+color.toHsvString(); // hsva(0, 100%, 100%, 0.5)
 ```
-### toHsl
-```js
-var color = tinycolor("red");
-color.toHsl(); // { h: 0, s: 1, l: 0.5, a: 1 }
-```
-### toHslString
-```js
-var color = tinycolor("red");
-color.toHslString(); // "hsl(0, 100%, 50%)"
-color.setAlpha(0.5);
-color.toHslString(); // "hsla(0, 100%, 50%, 0.5)"
-```
-### toHex
-```js
-var color = tinycolor("red");
-color.toHex(); // "ff0000"
-```
-### toHexString
-```js
-var color = tinycolor("red");
-color.toHexString(); // "#ff0000"
-```
-### toHex8
-```js
-var color = tinycolor("red");
-color.toHex8(); // "ff0000ff"
-```
-### toHex8String
-```js
-var color = tinycolor("red");
-color.toHex8String(); // "#ff0000ff"
-```
-### toRgb
-```js
-var color = tinycolor("red");
-color.toRgb(); // { r: 255, g: 0, b: 0, a: 1 }
-```
-### toRgbString
-```js
-var color = tinycolor("red");
-color.toRgbString(); // "rgb(255, 0, 0)"
-color.setAlpha(0.5);
-color.toRgbString(); // "rgba(255, 0, 0, 0.5)"
-```
-### toPercentageRgb
-```js
-var color = tinycolor("red");
-color.toPercentageRgb() // { r: "100%", g: "0%", b: "0%", a: 1 }
-```
-### toPercentageRgbString
-```js
-var color = tinycolor("red");
-color.toPercentageRgbString(); // "rgb(100%, 0%, 0%)"
-color.setAlpha(0.5);
-color.toPercentageRgbString(); // "rgba(100%, 0%, 0%, 0.5)"
-```
-### toName
-```js
-var color = tinycolor("red");
-color.toName(); // "red"
-```
-### toFilter
-```
-var color = tinycolor("red");
-color.toFilter(); // "progid:DXImageTransform.Microsoft.gradient(startColorstr=#ffff0000,endColorstr=#ffff0000)"
-```
-### toString
 
-Print to a string, depending on the input format.  You can also override this by passing one of `"rgb", "prgb", "hex6", "hex3", "hex8", "name", "hsl", "hsv"` into the function.
+### toCmyk
 ```js
-var color1 = tinycolor("red");
-color1.toString(); // "red"
-color1.toString("hsv"); // "hsv(0, 100%, 100%)"
-
-var color2 = tinycolor("rgb(255, 0, 0)");
-color2.toString(); // "rgb(255, 0, 0)"
-color2.setAlpha(.5);
-color2.toString(); // "rgba(255, 0, 0, 0.5)"
+var color = tinycolor("red");
+color.toCmyk(); // { c: 0, m: 100, y: 100, k: 0 }
 ```
-### Color Modification
 
+### toCmykString
+```js
+var color = tinycolor("red");
+color.toCmykString(); // cmyk(0%, 100%, 100%, 0%)
+```
+
+### toCmy
+```js
+var color = tinycolor("red");
+color.toCmy(); // { c: 0, m: 100, y: 100 }
+```
+
+### toCmyString
+```js
+var color = tinycolor("red");
+color.toCmyString(); // cmyk(0%, 100%, 100%)
+```
+
+### toXyz
+```js
+var color = tinycolor("red");
+color.toXyz(); // { x: 41.24564, y: 21.26729, z: 1.9333900000000002 }
+```
+
+### toXyzString
+```js
+var color = tinycolor("red");
+color.toXyzString(); // xyz(41.25, 21.27, 1.93)
+```
+
+### toLab
+```js
+var color = tinycolor("red");
+color.toLab(); // { l: 53.24079183328088, a: 80.09246954480042, b: 67.20319253649727 }
+```
+
+### toLabString
+```js
+var color = tinycolor("red");
+color.toLabString(); // lab(53.24, 80.09, 67.20)
+```
+
+### toNcol
+```js
+var color = tinycolor("red");
+color.toNcol(); // {n: "R0", w: 0, b: 0, a: 1}
+```
+
+### toNcolString
+```js
+var color = tinycolor("red");
+color.toNcolString(); // R0, 0%, 0%
+```
+
+### toNcs
+**Warning**
+*As mentioned above, this function tries to return a similar color. The color could be very DIFFERENT to the input or even CANNOT return a valid color.*
+Colors with large difference in R,G,B value or dark color is less likely to find a similar color.
+If no color found, the function return the darkest color (S 9000-N) 
+```js
+var color = tinycolor("grey");
+color.toNcs(); // {s: 50, c: 5, n: "N"}
+tinycolor("yellow").toNcs(); // {s: 90, c: 0, n: "N"} (no color found)
+```
+
+### toNcsString
+```js
+var color = tinycolor("grey");
+color.toNcsString(); // S 5005-N
+tinycolor("yellow").toNcsString(); // S 9000-N (no color found)
+```
+
+## Color Modification
 These methods manipulate the current color, and return it for chaining.  For instance:
 ```js
 tinycolor("red").lighten().desaturate().toHexString() // "#f53d3d"
 ```
-### lighten
 
-`lighten: function(amount = 10) -> TinyColor`.  Lighten the color a given amount, from 0 to 100.  Providing 100 will always return white.
+### tetradRect
+`tetradRect: function() -> array<TinyColor>`.
 ```js
-tinycolor("#f00").lighten().toString(); // "#ff3333"
-tinycolor("#f00").lighten(100).toString(); // "#ffffff"
-```
-### brighten
+var colors = tinycolor("#f00").tetradRect();
 
-`brighten: function(amount = 10) -> TinyColor`.  Brighten the color a given amount, from 0 to 100.
-```js
-tinycolor("#f00").brighten().toString(); // "#ff1919"
-```
-### darken
-
-`darken: function(amount = 10) -> TinyColor`.  Darken the color a given amount, from 0 to 100.  Providing 100 will always return black.
-```js
-tinycolor("#f00").darken().toString(); // "#cc0000"
-tinycolor("#f00").darken(100).toString(); // "#000000"
-```
-### desaturate
-
-`desaturate: function(amount = 10) -> TinyColor`.  Desaturate the color a given amount, from 0 to 100.  Providing 100 will is the same as calling `greyscale`.
-```js
-tinycolor("#f00").desaturate().toString(); // "#f20d0d"
-tinycolor("#f00").desaturate(100).toString(); // "#808080"
-```
-### saturate
-
-`saturate: function(amount = 10) -> TinyColor`.  Saturate the color a given amount, from 0 to 100.
-```js
-tinycolor("hsl(0, 10%, 50%)").saturate().toString(); // "hsl(0, 20%, 50%)"
-```
-### greyscale
-
-`greyscale: function() -> TinyColor`.  Completely desaturates a color into greyscale.  Same as calling `desaturate(100)`.
-```js
-tinycolor("#f00").greyscale().toString(); // "#808080"
-```
-### spin
-
-`spin: function(amount = 0) -> TinyColor`.  Spin the hue a given amount, from -360 to 360.  Calling with 0, 360, or -360 will do nothing (since it sets the hue back to what it was before).
-```js
-tinycolor("#f00").spin(180).toString(); // "#00ffff"
-tinycolor("#f00").spin(-90).toString(); // "#7f00ff"
-tinycolor("#f00").spin(90).toString(); // "#80ff00"
-
-// spin(0) and spin(360) do nothing
-tinycolor("#f00").spin(0).toString(); // "#ff0000"
-tinycolor("#f00").spin(360).toString(); // "#ff0000"
-```
-### Color Combinations
-
-Combination functions return an array of TinyColor objects unless otherwise noted.
-
-### analogous
-
-`analogous: function(, results = 6, slices = 30) -> array<TinyColor>`.
-```js
-var colors = tinycolor("#f00").analogous();
-
-colors.map(function(t) { return t.toHexString(); }); // [ "#ff0000", "#ff0066", "#ff0033", "#ff0000", "#ff3300", "#ff6600" ]
-```
-### monochromatic
-
-`monochromatic: function(, results = 6) -> array<TinyColor>`.
-```js
-var colors = tinycolor("#f00").monochromatic();
-
-colors.map(function(t) { return t.toHexString(); }); // [ "#ff0000", "#2a0000", "#550000", "#800000", "#aa0000", "#d40000" ]
-```
-### splitcomplement
-
-`splitcomplement: function() -> array<TinyColor>`.
-```js
-var colors = tinycolor("#f00").splitcomplement();
-
-colors.map(function(t) { return t.toHexString(); }); // [ "#ff0000", "#ccff00", "#0066ff" ]
-```
-### triad
-
-`triad: function() -> array<TinyColor>`.
-```js
-var colors = tinycolor("#f00").triad();
-
-colors.map(function(t) { return t.toHexString(); }); // [ "#ff0000", "#00ff00", "#0000ff" ]
-```
-### tetrad
-
-`tetrad: function() -> array<TinyColor>`.
-```js
-var colors = tinycolor("#f00").tetrad();
-
-colors.map(function(t) { return t.toHexString(); }); // [ "#ff0000", "#80ff00", "#00ffff", "#7f00ff" ]
-
-```
-### complement
-
-`complement: function() -> TinyColor`.
-```js
-tinycolor("#f00").complement().toHexString(); // "#00ffff"
-```
-## Color Utilities
-```js
-tinycolor.equals(color1, color2)
-tinycolor.mix(color1, color2, amount = 50)
-```
-### random
-
-Returns a random color.
-```js
-var color = tinycolor.random();
-color.toRgb(); // "{r: 145, g: 40, b: 198, a: 1}"
+colors.map(function(t) { return t.toHexString(); }); // [ #ff0000", "#ffff00", "#00ffff", "#0000ff" ]
 ```
 
-### Readability
-
-TinyColor assesses readability based on the [Web Content Accessibility Guidelines (Version 2.0)](http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef).
-
-#### readability
-
-`readability: function(TinyColor, TinyColor) -> Object`.
-Returns the contrast ratio between two colors.
+### pentad
+`pentad: function() -> array<TinyColor>`.
 ```js
-tinycolor.readability("#000", "#000"); // 1
-tinycolor.readability("#000", "#111"); // 1.1121078324840545
-tinycolor.readability("#000", "#fff"); // 21
+var colors = tinycolor("#f00").pentad();
+
+colors.map(function(t) { return t.toHexString(); }); // [ "#ff0000", "#ccff00", "#00ff66", "#0066ff", "#cc00ff" ]
 ```
-Use the values in your own calculations, or use one of the convenience functions below.
 
-#### isReadable
-
-`isReadable: function(TinyColor, TinyColor, Object) -> Boolean`.  Ensure that foreground and background color combinations meet WCAG guidelines. `Object` is optional, defaulting to `{level: "AA",size: "small"}`.  `level` can be `"AA"` or "AAA" and `size` can be `"small"` or `"large"`.
-
-Here are links to read more about the [AA](http://www.w3.org/TR/UNDERSTANDING-WCAG20/visual-audio-contrast-contrast.html) and [AAA](http://www.w3.org/TR/UNDERSTANDING-WCAG20/visual-audio-contrast7.html) requirements.
+### hexad
+`hexad: function() -> array<TinyColor>`.
 ```js
-tinycolor.isReadable("#000", "#111", {}); // false
-tinycolor.isReadable("#ff0088", "#5c1a72",{level:"AA",size:"small"}); //false
-tinycolor.isReadable("#ff0088", "#5c1a72",{level:"AA",size:"large"}), //true
-```
-#### mostReadable
+var colors = tinycolor("#f00").hexad();
 
-`mostReadable: function(TinyColor, [TinyColor, Tinycolor ...], Object) -> Boolean`.
-Given a base color and a list of possible foreground or background colors for that base, returns the most readable color.
-If none of the colors in the list is readable, `mostReadable` will return the better of black or white if `includeFallbackColors:true`.
+colors.map(function(t) { return t.toHexString(); }); // [ "#ff0000", "#ffff00", "#00ff00", "#00ffff", "#0000ff", "#ff00ff" ]
+```
+
+## Plugin
+There is a [plugin](https://raw.githubusercontent.com/chingcm/TinyColor/master/tinycolor.plugin.js) that stored some common color used in modern HTML framework (e.g. Flat UI, Material, Metro UI). A color list of Natural Color System (NCS) are included too. You may include the plugin after the main script to use it.
+```html
+<script type='text/javascript' src='tinycolor.js'></script>
+<script type='text/javascript' src='tinycolor.plugin.js'></script>
+```
+
+### Colors in Library
+Without the plugin, you can get the hex list of Web Colors by names.
 ```js
-tinycolor.mostReadable("#000", ["#f00", "#0f0", "#00f"]).toHexString(); // "#00ff00"
-tinycolor.mostReadable("#123", ["#124", "#125"],{includeFallbackColors:false}).toHexString(); // "#112255"
-tinycolor.mostReadable("#123", ["#124", "#125"],{includeFallbackColors:true}).toHexString();  // "#ffffff"
-tinycolor.mostReadable("#ff0088", ["#2e0c3a"],{includeFallbackColors:true,level:"AAA",size:"large"}).toHexString()   // "#2e0c3a",
-tinycolor.mostReadable("#ff0088", ["#2e0c3a"],{includeFallbackColors:true,level:"AAA",size:"small"}).toHexString()   // "#000000",
+tinycolor.names.red; // "f00"
+tinycolor.names.black; // "000"
 ```
-See [index.html](https://github.com/bgrins/TinyColor/blob/master/index.html) in the project for a demo.
 
-## Common operations
+With the plugin, you can get extra colors of `Bootstrap 3`, `Bootstrap 4`, `Flat UI`, `Material`, `Metro UI`, `Windows`, `W3` and `Natural Color System`. Every color in `Material` or `Flat UI` contains a list of that color in different shades.
 
-### clone
-
-`clone: function() -> TinyColor`.
-Instantiate a new TinyColor object with the same color.  Any changes to the new one won't affect the old one.
+Color can be accessed in two ways. Use `tinycolor.library` to directly get the hex code of the color.
 ```js
-var color1 = tinycolor("#F00");
-var color2 = color1.clone();
-color2.setAlpha(.5);
-
-color1.toString(); // "#ff0000"
-color2.toString(); // "rgba(255, 0, 0, 0.5)"
+tinycolor.library.bootstrap4.danger; // "dc3545"
+tinycolor.library.material.pink["500"]; // "e91e63"
 ```
+Use `tinycolor.plugins.getLibraryColor` to return the TinyColor object of that color. To simplify, stating `bootstrap` without its version will always means `bootstrap4`. Colors of `material` or `flatui` will means the color with shade `500` by default.
+```js
+// Get by function
+tinycolor.plugins.getLibraryColor("bootstrap4-danger"); // tinycolor("dc3545")
+tinycolor.plugins.getLibraryColor("material-pink-500"); // tinycolor("e91e63")
+tinycolor.plugins.getLibraryColor("material-pink"); // tinycolor("e91e63")
+```
+
+### Natural Color System
+If using this plugin, `toNcs` and `toNcsString` will first search the NCS color list in the library. Since the colors in library is much closer to the color displayed in NCS official website, it could return a more accurate result compare to without using the plugin.
+
+## Credit
+This repository is modified from [TinyColor](https://github.com/bgrins/TinyColor) by Brian Grinstead.
